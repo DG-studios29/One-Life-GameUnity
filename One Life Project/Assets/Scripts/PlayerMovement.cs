@@ -2,25 +2,43 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float moveSpeed = 5f; // Speed at which the player moves
-
-    private Rigidbody rb; // Reference to the Rigidbody component
+    public float speed = 20f; // Speed of the player
+    private Rigidbody rb;
+    private CameraFollow cameraFollow;
+    public Animator anim; // Animator for player animations
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>(); // Get the Rigidbody component attached to this GameObject
+        rb = GetComponent<Rigidbody>();
+        cameraFollow = FindObjectOfType<CameraFollow>(); // Find the CameraFollow script
+
+        if (anim == null)
+        {
+            anim = GetComponent<Animator>(); // Find the Animator component if not assigned
+        }
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        // Get input from the player
+        MovePlayer();
+    }
+
+    void MovePlayer()
+    {
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
 
-        // Calculate movement direction based on the input
-        Vector3 movement = new Vector3(moveHorizontal, 0f, moveVertical) * moveSpeed * Time.deltaTime;
+        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+        Vector3 rotatedMovement = Quaternion.Euler(0, cameraFollow.currentRotationAngle, 0) * movement;
 
-        // Apply the movement to the Rigidbody's position
-        rb.MovePosition(transform.position + movement);
+        if (movement.magnitude > 0)
+        {
+            anim.SetBool("isWalking", true);
+            rb.MovePosition(transform.position + rotatedMovement * speed * Time.deltaTime);
+        }
+        else
+        {
+            anim.SetBool("isWalking", false);
+        }
     }
 }

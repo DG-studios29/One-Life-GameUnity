@@ -6,13 +6,13 @@ public class EnemyAI : MonoBehaviour
     public float lookRadius = 10f;
     Transform target;
     NavMeshAgent agent;
-    //Animator anim; // Assuming you have an animator for enemy animations
+    Animator anim; // Assuming you have an animator for enemy animations
 
     void Start()
     {
         target = PlayerManager.instance.player.transform;
         agent = GetComponent<NavMeshAgent>();
-        //anim = GetComponent<Animator>(); // Initialize your animator
+        anim = GetComponent<Animator>(); // Initialize your animator
     }
 
     void Update()
@@ -26,6 +26,7 @@ public class EnemyAI : MonoBehaviour
             if (IsPlayerVisible())
             {
                 agent.SetDestination(target.position);
+                anim.SetBool("isWalking", true);
 
                 if (distance <= agent.stoppingDistance)
                 {
@@ -39,8 +40,16 @@ public class EnemyAI : MonoBehaviour
             {
                 // Player is not visible, stop chasing
                 agent.ResetPath(); // Stop moving towards the player
+                anim.SetBool("isWalking", false);
             }
+
+            
         }
+        else
+        {
+            anim.SetBool("isWalking", false);
+        }
+        
     }
 
     bool IsPlayerVisible()
@@ -56,6 +65,7 @@ public class EnemyAI : MonoBehaviour
             }
         }
         return false; // Player is not visible
+
     }
 
     void FaceTarget()
